@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Audio Player</title>
+  </head>
+  <body>
+    <button id="play-button">Play</button>
+    <button id="pause-button">Pause</button>
+    <input
+      id="volume-control"
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      value="0.5"
+    />
+    <script>
+      // Create an AudioContext
+      const audioContext = new AudioContext();
+
+      // Load an audio file
+      fetch("./music.mp3")
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => audioContext.decodeAudioData(arrayBuffer))
+        .then((audioBuffer) => {
+          // Create a buffer source
+          const bufferSource = audioContext.createBufferSource();
+          bufferSource.buffer = audioBuffer;
+
+          // Create a gain node to control the volume
+          const gainNode = audioContext.createGain();
+          gainNode.gain.value = 0.5; // Set the initial volume to 50%
+
+          // Connect the buffer source to the gain node
+          bufferSource.connect(gainNode);
+
+          // Connect the gain node to the audio context's destination
+          gainNode.connect(audioContext.destination);
+
+          // Start playing the sound
+          bufferSource.start();
+
+          // Create a play button
+          const playButton = document.querySelector("#play-button");
+          playButton.addEventListener("click", () => {
+            bufferSource.start();
+          });
+
+          // Create a pause button
+          const pauseButton = document.querySelector("#pause-button");
+          pauseButton.addEventListener("click", () => {
+            bufferSource.stop();
+          });
+
+          // Create a range input to control the volume
+          const rangeInput = document.querySelector("#volume-control");
+          rangeInput.addEventListener("input", () => {
+            gainNode.gain.value = rangeInput.value;
+          });
+        });
+    </script>
+  </body>
+</html>
